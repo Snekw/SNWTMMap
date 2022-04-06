@@ -2,7 +2,8 @@
 name = "SNWTMMap"
 author = "Snekw"
 category = "Utilities"
-version = "0.0.1"
+version = "0.0.2"
+siteid = 187
 
 [script]
 imports = [ "Formatting.as", "Time.as" ]

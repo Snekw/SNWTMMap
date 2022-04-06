@@ -24,29 +24,37 @@ Net::HttpRequest@ PostAsync(const string &in url, const Json::Value &in data){
 
 void Main(){
 	auto app = cast<CTrackMania>(GetApp());
-	auto network = cast<CTrackManiaNetwork>(app.Network);
 
     string currentMapUid = "";
     bool lastMapSent = false;
     bool sendingMap = false;
+    bool thisErrored = false;
+    int retries = 5;
+    int delay = 1000;
 
     while(true){
         auto map = app.RootMap;
 
         if(enabled && map !is null && map.MapInfo.MapUid != "" && app.Editor is null){
-            if(currentMapUid != map.MapInfo.MapUid){
-
-                currentMapUid = map.MapInfo.MapUid;
+            auto mapUid = map.MapInfo.MapUid;
+            if(currentMapUid != mapUid){
+                print("Map changed. (old: "+tostring(currentMapUid)+" new: " + tostring(mapUid) +")");
+                currentMapUid = mapUid;
                 lastMapSent = false;
+                thisErrored = false;
+                retries = 5;
+                delay = 1000;
             }
-        }else if(enabled && map is null){
+        } else if(enabled) {
             lastMapSent = false;
-            sendingMap = false;
             currentMapUid = "";
+            thisErrored = false;
+            retries = 5;
+            delay = 1000;
         }
 
-        if(currentMapUid != "" && lastMapSent == false){
-            if(sendingMap == false){
+        if(enabled && currentMapUid != "" && lastMapSent == false){
+            if(sendingMap == false && (thisErrored == false || retries > 0)){
                 sendingMap = true;
                 Json::Value data = Json::Object();
                 data["mapUid"] = currentMapUid;
@@ -56,21 +64,25 @@ void Main(){
                 data["mapGoldTime"] = Time::Format(map.MapInfo.TMObjective_GoldTime);
                 data["mapSilverTime"] = Time::Format(map.MapInfo.TMObjective_SilverTime);
                 data["mapBronzeTime"] = Time::Format(map.MapInfo.TMObjective_GoldTime);
+                print("Sending map info. ("+tostring(currentMapUid)+")");
                 auto result = PostAsync(endpointUrl, data);
                 auto code = result.ResponseCode();
                 if(code == 200){
                     auto response = result.String();
                     if(response == currentMapUid){
                         lastMapSent = true;
+                        print("Map info sent. (" + tostring(response) + ")");
                     }
-                    sendingMap = false;
-                    print(response);
-                }else{
-                    UI::ShowNotification("SNWTMMap", "Failed to send map info. ("+tostring(code)+")");
+                } else {
+                    print("Failed to send map info. ("+tostring(code)+")");
+                    retries = retries - 1;
+                    delay = 5000;
+                    thisErrored = true;
                 }
+                sendingMap = false;
             }
         }
 
-        sleep(1000);
+        sleep(delay);
     }
 }
