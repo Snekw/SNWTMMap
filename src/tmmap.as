@@ -4,7 +4,7 @@ bool enabled = false;
 [Setting category="Advanced" name="Endpoint"]
 string endpointUrl = "https://tm.snekw.com/api/map/update";
 
-[Setting category="Info" name="Token" description="Token is retrieved from https://tm.snekw.com/map or from self hosted instance"]
+[Setting category="Info" name="Token" description="Token is retrieved from https://tm.snekw.com/map or from self hosted instance" password]
 string token = "";
 
 Net::HttpRequest@ PostAsync(const string &in url, const Json::Value &in data){
