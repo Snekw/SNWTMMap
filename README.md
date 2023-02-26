@@ -16,3 +16,7 @@ Requires a token from https://tm.snekw.com/map or self hosted version of https:/
 ### Advanced
 
 * Endpoint - Used if a self hosted version of SNWTM is used. Set to the URL to the API of the self hosted version.
+
+### Restore Web
+
+* Contains methods to retrieve the currently in use token to use to restore the web page if the web page token fails to restore automatically.

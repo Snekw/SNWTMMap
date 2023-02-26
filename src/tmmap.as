@@ -86,3 +86,16 @@ void Main(){
         sleep(delay);
     }
 }
+
+[SettingsTab name="Restore Web"]
+void RenderSettings(){
+    UI::Text("Click the button below to retrieve the currently used token.");
+    UI::Text("This is useful if you need to restore the token on the web site.");
+    if(UI::Button("Copy Token to clipboard")){
+        IO::SetClipboard(token);
+        print("Token copied to clipboard");
+    }
+    if(UI::Button("Print Token to Log")){
+        print("Token: " + token);
+    }
+}
